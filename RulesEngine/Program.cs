@@ -12,40 +12,64 @@ namespace RulesEngine
     /// </summary>
     class Program
     {
+        // Use the following flags to enable/disable the rules
+        static bool ruleOneEnabled = true, ruleTwoEnabled = true,
+                ruleThreeEnabled = true, ruleFourEnabled = true;
+
         static void Main(string[] args)
         {
             Console.WriteLine("Enter the text:");
             var text = Console.ReadLine();
-            var words = text.Split(' ');
-
-            // Use the following flags to enable/disable the rules
-            bool ruleOneEnabled = true, ruleTwoEnabled = true,
-                ruleThreeEnabled = true, ruleFourEnabled = true;
-
-            // Rule 1 characters can be reconfigured in the following
-            if (ruleOneEnabled)
-                CalcAvgLengthOfWordsStartingWithChar(words, new List<string>() { "a", "A" });
-
-            // Rule 2 characters can be reconfigured in the following
-            if (ruleTwoEnabled)
-                CountCharInWordsStartingWithChar(words, new List<string>() { "b", "B" }, 
-                    new List<string>() { "e", "E" });
-
-            // Rule 3 characters can be reconfigured in the following
-            if (ruleThreeEnabled)
-                GetLongestWordLengthInWordsStartingWithChar(words, new List<string>() { "a", "b", "c" });
-
-            // Rule 4 characters can be reconfigured in the following
-            if (ruleFourEnabled)
-                CountConsecutiveWordSequence(words, new List<string>() { "c", "C" }, 
-                    new List<string>() { "a", "A"});
-
-            /*
-             New rules can be added here.
-             */
+            var words = text.Split(' ').ToList();
+            ApplyRules(words);
 
             Console.WriteLine("The output files are saved in working directory");
             Console.Read();
+        }
+
+        private static void ApplyRules(IEnumerable<string> words)
+        {
+            // Rule 1 characters can be reconfigured in the following
+            if (ruleOneEnabled)
+            {
+                var ans = GetRulesConfig("Enter the prefix character in LowerCase for rule 1 if you want to reconfigure");
+                var prefixChar = ans != null ? new List<string>() { ans, ans.ToLower() } : new List<string>() { "a", "A" };
+                CalcAvgLengthOfWordsStartingWithChar(words, prefixChar);
+            }
+
+            // Rule 2 characters can be reconfigured in the following
+            if (ruleTwoEnabled)
+            {
+                var ans = GetRulesConfig("Enter the prefix character in LowerCase for rule 2 if you want to reconfigure");
+                var prefixChar = ans != null ? new List<string>() { ans, ans.ToLower() } : new List<string>() { "b", "B" };
+
+                ans = GetRulesConfig("Enter the match character in LowerCase for rule 2 if you want to reconfigure");
+                var matchingChar = ans != null ? new List<string>() { ans, ans.ToLower() } : new List<string>() { "e", "E" };
+                CountCharInWordsStartingWithChar(words, prefixChar, matchingChar);
+            }
+
+            // Rule 3 characters can be reconfigured in the following
+            if (ruleThreeEnabled)
+            {
+                GetLongestWordLengthInWordsStartingWithChar(words, new List<string>() { "a", "b", "c" });
+            }
+
+            // Rule 4 characters can be reconfigured in the following
+            if (ruleFourEnabled)
+            {
+                var ans = GetRulesConfig(@"Enter the starting character in LowerCase for first word of rule 4 
+                                           if you want to reconfigure");
+                var firstChar = ans != null ? new List<string>() { ans, ans.ToLower() } : new List<string>() { "c", "C" };
+
+                ans = GetRulesConfig(@"Enter the starting character in LowerCase for second word of rule 4 
+                                       if you want to reconfigure");
+                var secondChar = ans != null ? new List<string>() { ans, ans.ToLower() } : new List<string>() { "a", "A" };
+                CountConsecutiveWordSequence(words, firstChar, secondChar);
+            }
+                
+            /*
+             New rules can be added here.
+             */
         }
 
         private static IEnumerable<string> GetWordsStartingWithCharacter(IEnumerable<string> words, 
